@@ -1,15 +1,18 @@
 use itertools::Itertools;
 
+fn parse_dimensions(line: &str) -> (u32, u32, u32) {
+    line.split("x")
+        .map(|num| num.parse::<u32>().unwrap())
+        .sorted()
+        .collect_tuple()
+        .unwrap()
+}
+
 pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
         .map(|line| {
-            let dimensions: (u32, u32, u32) = line
-                .split("x")
-                .map(|num| num.parse::<u32>().unwrap())
-                .sorted()
-                .collect_tuple()
-                .unwrap();
+            let dimensions: (u32, u32, u32) = parse_dimensions(line);
             dimensions.0 * dimensions.1
                 + 2 * dimensions.0 * dimensions.1
                 + 2 * dimensions.0 * dimensions.2
