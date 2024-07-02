@@ -18,7 +18,26 @@ pub fn process_part_1(input: &str) -> u32 {
 }
 
 pub fn process_part_2(input: &str) -> u32 {
-    todo!()
+    let mut houses: BTreeSet<(i32, i32)> = BTreeSet::new();
+    let mut santa_house = (0, 0);
+    let mut robo_santa_house = (0, 0);
+    houses.insert(santa_house);
+    for (i, c) in input.chars().enumerate() {
+        let house = if i % 2 == 0 {
+            &mut santa_house
+        } else {
+            &mut robo_santa_house
+        };
+        match c {
+            '^' => house.1 += 1,
+            'v' => house.1 -= 1,
+            '>' => house.0 += 1,
+            '<' => house.0 -= 1,
+            char => panic!("invalid input: {{{}}}", char),
+        };
+        houses.insert(*house);
+    }
+    houses.len() as u32
 }
 
 #[cfg(test)]
