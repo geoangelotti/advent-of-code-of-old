@@ -1,5 +1,20 @@
+use std::collections::BTreeSet;
+
 pub fn process_part_1(input: &str) -> u32 {
-    todo!()
+    let mut houses: BTreeSet<(i32, i32)> = BTreeSet::new();
+    let mut house = (0, 0);
+    houses.insert(house);
+    for c in input.chars() {
+        house = match c {
+            '^' => (house.0, house.1 + 1),
+            'v' => (house.0, house.1 - 1),
+            '>' => (house.0 + 1, house.1),
+            '<' => (house.0 - 1, house.1),
+            char => panic!("invalid input: {{{}}}", char),
+        };
+        houses.insert(house);
+    }
+    houses.len() as u32
 }
 
 #[cfg(test)]
