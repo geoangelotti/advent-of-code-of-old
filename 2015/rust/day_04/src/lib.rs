@@ -2,7 +2,7 @@ fn find_number(input: &str, target: &str) -> u32 {
     let mut i = 0;
     loop {
         let hash = md5::compute(format!("{}{}", input, i));
-        let prefix = &format!("{:?}", hash)[0..5];
+        let prefix = &format!("{:?}", hash)[0..target.len()];
         if prefix == target {
             break;
         }
