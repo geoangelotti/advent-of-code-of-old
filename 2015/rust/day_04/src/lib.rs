@@ -1,5 +1,14 @@
 pub fn process_part_1(input: &str) -> u32 {
-    todo!()
+    let mut i = 0;
+    loop {
+        let hash = md5::compute(format!("{}{}", input, i));
+        let prefix = &format!("{:?}", hash)[0..5];
+        if prefix == "00000" {
+            break;
+        }
+        i += 1;
+    }
+    return i;
 }
 
 #[cfg(test)]
