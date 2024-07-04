@@ -27,6 +27,10 @@ pub fn process_part_1(input: &str) -> u32 {
         .len() as u32
 }
 
+pub fn process_part_2(input: &str) -> u32 {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -40,6 +44,16 @@ mod tests {
     #[case("dvszwmarrgswjxmb", 0)]
     fn test_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case("qjhvhtzxzqqjkmpb", 1)]
+    #[case("xxyxx", 1)]
+    #[case("uurcxstgmygtbstg", 0)]
+    #[case("ieodomkazucvgmuy", 0)]
+    fn test_part_2(#[case] input: &str, #[case] expected: u32) {
+        let result = process_part_2(input);
         assert_eq!(result, expected);
     }
 }
