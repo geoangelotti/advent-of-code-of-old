@@ -1,7 +1,7 @@
 fn contains_vowels(input: &str) -> bool {
     input
         .chars()
-        .filter(|c| vec!['a', 'e', 'i', 'o', 'u'].contains(c))
+        .filter(|c| ['a', 'e', 'i', 'o', 'u'].contains(c))
         .count()
         > 2
 }
@@ -22,7 +22,6 @@ fn contains_duplicate(input: &str) -> bool {
 pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
-        .into_iter()
         .filter(|&line| {
             let has_enough_vowels = contains_vowels(line);
             let has_bad_strings = contains_bad_strings(line);
@@ -56,7 +55,6 @@ fn contains_repeating_with_seperator(input: &str) -> bool {
 pub fn process_part_2(input: &str) -> u32 {
     input
         .lines()
-        .into_iter()
         .filter(|&line| {
             let has_repeating = contains_repeating_with_seperator(line);
             let has_pair = contains_pair(line);

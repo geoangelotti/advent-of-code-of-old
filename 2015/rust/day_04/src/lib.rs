@@ -8,7 +8,7 @@ fn find_number(input: &str, target: &str) -> u32 {
         }
         i += 1;
     }
-    return i;
+    i
 }
 
 pub fn process_part_1(input: &str) -> u32 {
