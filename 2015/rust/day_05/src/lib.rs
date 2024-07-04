@@ -1,20 +1,18 @@
-use std::collections::BTreeSet;
+fn has_enough_vowels(input: &str) -> bool {
+    input
+        .chars()
+        .filter(|c| vec!['a', 'e', 'i', 'o', 'u'].contains(c))
+        .count()
+        > 2
+}
 
 pub fn process_part_1(input: &str) -> u32 {
-    let vowels = vec!['a', 'e', 'i', 'o', 'u']
-        .into_iter()
-        .collect::<BTreeSet<char>>();
     let bad_strings = vec!["ab", "cd", "pq", "xy"];
     input
         .lines()
         .into_iter()
         .filter(|line| {
-            let has_enough_vowels = line
-                .chars()
-                .filter(|c| vowels.contains(c))
-                .collect::<Vec<char>>()
-                .len()
-                > 2;
+            let has_enough_vowels = has_enough_vowels(input);
             let has_bad_strings = bad_strings
                 .clone()
                 .into_iter()
@@ -31,6 +29,15 @@ pub fn process_part_1(input: &str) -> u32 {
 mod tests {
     use super::*;
     use rstest::rstest;
+
+    #[rstest]
+    #[case("aei", true)]
+    #[case("xazegov", true)]
+    #[case("aeiouaeiouaeiou", true)]
+    fn test_has_enough_vowels(#[case] input: &str, #[case] expected: bool) {
+        let result = has_enough_vowels(input);
+        assert_eq!(result, expected);
+    }
 
     #[rstest]
     #[case("ugknbfddgicrmopn", 1)]
