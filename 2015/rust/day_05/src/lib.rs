@@ -33,6 +33,16 @@ pub fn process_part_1(input: &str) -> u32 {
         .len() as u32
 }
 
+fn contains_pair(chars: &str) -> bool {
+    for i in 0..chars.len() - 2 {
+        let pair = &chars[i..i + 2];
+        if chars[i + 2..].contains(pair) {
+            return true;
+        }
+    }
+    false
+}
+
 pub fn process_part_2(input: &str) -> u32 {
     todo!()
 }
@@ -78,6 +88,15 @@ mod tests {
     #[case("dvszwmarrgswjxmb", 0)]
     fn test_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case("xyxy", true)]
+    #[case("aabcdefgaa", true)]
+    #[case("aaa", false)]
+    fn test_contains_pair(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_pair(input);
         assert_eq!(result, expected);
     }
 
