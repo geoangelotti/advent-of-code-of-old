@@ -6,18 +6,19 @@ fn has_enough_vowels(input: &str) -> bool {
         > 2
 }
 
+fn contains_bad_strings(input: &str) -> bool {
+    vec!["ab", "cd", "pq", "xy"]
+        .into_iter()
+        .any(|s| input.contains(s))
+}
+
 pub fn process_part_1(input: &str) -> u32 {
-    let bad_strings = vec!["ab", "cd", "pq", "xy"];
     input
         .lines()
         .into_iter()
         .filter(|line| {
             let has_enough_vowels = has_enough_vowels(input);
-            let has_bad_strings = bad_strings
-                .clone()
-                .into_iter()
-                .map(|s| line.contains(s))
-                .any(|a| a);
+            let has_bad_strings = contains_bad_strings(input);
             let has_duplicate = line.chars().zip(line.chars().skip(1)).any(|(a, b)| a == b);
             has_enough_vowels && has_duplicate && !has_bad_strings
         })
@@ -29,6 +30,15 @@ pub fn process_part_1(input: &str) -> u32 {
 mod tests {
     use super::*;
     use rstest::rstest;
+
+    #[rstest]
+    #[case("haegwjzuvuyypxyu", true)]
+    #[case("jchzalrnumimnmhp", false)]
+    #[case("dvszwmarrgswjxmb", false)]
+    fn test_contains_bad_strings(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_bad_strings(input);
+        assert_eq!(result, expected);
+    }
 
     #[rstest]
     #[case("aei", true)]
