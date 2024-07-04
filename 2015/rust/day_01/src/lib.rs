@@ -13,7 +13,7 @@ pub fn process_part_1(input: &str) -> i32 {
 pub fn process_part_2(input: &str) -> usize {
     let mut acc = 0;
     let mut index = 0;
-    for (i, c) in input.chars().enumerate().into_iter() {
+    for (i, c) in input.chars().enumerate() {
         acc += floor_resolve(c);
         if acc == -1 {
             index = i;

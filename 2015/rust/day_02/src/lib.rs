@@ -1,7 +1,7 @@
 use itertools::Itertools;
 
 fn parse_dimensions(line: &str) -> (u32, u32, u32) {
-    line.split("x")
+    line.split('x')
         .map(|num| num.parse::<u32>().unwrap())
         .sorted()
         .collect_tuple()
