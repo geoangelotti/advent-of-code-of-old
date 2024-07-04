@@ -12,6 +12,13 @@ fn contains_bad_strings(input: &str) -> bool {
         .any(|s| input.contains(s))
 }
 
+fn contains_duplicate(input: &str) -> bool {
+    input
+        .chars()
+        .zip(input.chars().skip(1))
+        .any(|(a, b)| a == b)
+}
+
 pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
@@ -19,7 +26,7 @@ pub fn process_part_1(input: &str) -> u32 {
         .filter(|line| {
             let has_enough_vowels = has_enough_vowels(input);
             let has_bad_strings = contains_bad_strings(input);
-            let has_duplicate = line.chars().zip(line.chars().skip(1)).any(|(a, b)| a == b);
+            let has_duplicate = contains_duplicate(line);
             has_enough_vowels && has_duplicate && !has_bad_strings
         })
         .collect::<Vec<&str>>()
@@ -46,6 +53,16 @@ mod tests {
     #[case("aeiouaeiouaeiou", true)]
     fn test_has_enough_vowels(#[case] input: &str, #[case] expected: bool) {
         let result = has_enough_vowels(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case("xx", true)]
+    #[case("abcdde", true)]
+    #[case("aabbccdd", true)]
+    #[case("jchzalrnumimnmhp", false)]
+    fn test_contains_duplicates(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_duplicate(input);
         assert_eq!(result, expected);
     }
 
