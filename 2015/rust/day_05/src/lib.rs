@@ -33,8 +33,36 @@ pub fn process_part_1(input: &str) -> u32 {
         .len() as u32
 }
 
+fn contains_pair(chars: &str) -> bool {
+    for i in 0..chars.len() - 2 {
+        let pair = &chars[i..i + 2];
+        if chars[i + 2..].contains(pair) {
+            return true;
+        }
+    }
+    false
+}
+
+fn contains_repeating_with_seperator(input: &str) -> bool {
+    let chars = input.chars().collect::<Vec<char>>();
+    for i in 0..chars.len() - 2 {
+        if chars[i] == chars[i + 2] {
+            return true;
+        }
+    }
+    false
+}
+
 pub fn process_part_2(input: &str) -> u32 {
-    todo!()
+    input
+        .lines()
+        .into_iter()
+        .filter(|&line| {
+            let has_repeating = contains_repeating_with_seperator(line);
+            let has_pair = contains_pair(line);
+            has_repeating && has_pair
+        })
+        .count() as u32
 }
 
 #[cfg(test)]
@@ -82,10 +110,29 @@ mod tests {
     }
 
     #[rstest]
+    #[case("xyxy", true)]
+    #[case("aabcdefgaa", true)]
+    #[case("aaa", false)]
+    fn test_contains_pair(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_pair(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case("xyx", true)]
+    #[case("abcdefeghi", true)]
+    #[case("aaa", true)]
+    fn test_contains_repeating_with_seperator(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_repeating_with_seperator(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
     #[case("qjhvhtzxzqqjkmpb", 1)]
     #[case("xxyxx", 1)]
     #[case("uurcxstgmygtbstg", 0)]
     #[case("ieodomkazucvgmuy", 0)]
+    #[case("cvsrbdcvhtxxdmro", 0)]
     fn test_part_2(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_2(input);
         assert_eq!(result, expected);
