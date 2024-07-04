@@ -1,3 +1,56 @@
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{self, newline},
+    multi::separated_list1,
+    sequence::separated_pair,
+    IResult, Parser,
+};
+
+#[derive(Clone, Copy, Debug)]
+enum Action {
+    Toggle,
+    TurnOn,
+    TurnOff,
+}
+
+#[derive(Clone, Copy, Debug)]
+struct Command {
+    action: Action,
+    start: (u32, u32),
+    end: (u32, u32),
+}
+
+fn parse_action(input: &str) -> IResult<&str, Action> {
+    let (input, action) = alt((
+        tag("toggle").map(|_| Action::Toggle),
+        tag("turn on").map(|_| Action::TurnOn),
+        tag("turn off").map(|_| Action::TurnOff),
+    ))(input)?;
+    Ok((input, action))
+}
+
+fn parse_point(input: &str) -> IResult<&str, (u32, u32)> {
+    let (input, point) = separated_pair(complete::u32, tag(","), complete::u32)(input)?;
+    Ok((input, point))
+}
+
+fn parse_points(input: &str) -> IResult<&str, ((u32, u32), (u32, u32))> {
+    let (input, points) = separated_pair(parse_point, tag(" through "), parse_point)(input)?;
+    Ok((input, points))
+}
+
+fn parse_line(input: &str) -> IResult<&str, Command> {
+    let (input, (action, (start, end))) =
+        separated_pair(parse_action, tag(" "), parse_points)(input)?;
+    Ok((input, Command { action, start, end }))
+}
+
+fn parse_lines(input: &str) -> IResult<&str, Vec<Command>> {
+    let (input, commands) = separated_list1(newline, parse_line)(input)?;
+    Ok((input, commands))
+}
+
 pub fn process_part_1(input: &str) -> u32 {
     todo!();
 }
