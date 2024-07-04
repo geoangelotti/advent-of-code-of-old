@@ -1,4 +1,4 @@
-fn has_enough_vowels(input: &str) -> bool {
+fn contains_vowels(input: &str) -> bool {
     input
         .chars()
         .filter(|c| vec!['a', 'e', 'i', 'o', 'u'].contains(c))
@@ -24,7 +24,7 @@ pub fn process_part_1(input: &str) -> u32 {
         .lines()
         .into_iter()
         .filter(|line| {
-            let has_enough_vowels = has_enough_vowels(input);
+            let has_enough_vowels = contains_vowels(input);
             let has_bad_strings = contains_bad_strings(input);
             let has_duplicate = contains_duplicate(line);
             has_enough_vowels && has_duplicate && !has_bad_strings
@@ -51,8 +51,8 @@ mod tests {
     #[case("aei", true)]
     #[case("xazegov", true)]
     #[case("aeiouaeiouaeiou", true)]
-    fn test_has_enough_vowels(#[case] input: &str, #[case] expected: bool) {
-        let result = has_enough_vowels(input);
+    fn test_contains_vowels(#[case] input: &str, #[case] expected: bool) {
+        let result = contains_vowels(input);
         assert_eq!(result, expected);
     }
 
