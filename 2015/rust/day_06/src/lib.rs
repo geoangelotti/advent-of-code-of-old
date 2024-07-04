@@ -52,7 +52,24 @@ fn parse_lines(input: &str) -> IResult<&str, Vec<Command>> {
 }
 
 pub fn process_part_1(input: &str) -> u32 {
-    todo!();
+    let (_, commands) = parse_lines(input).unwrap();
+    let mut grid: Vec<Vec<bool>> = vec![vec![false; 1000]; 1000];
+    for command in commands {
+        //dbg!(command.start.0..command.end.0);
+        for i in command.start.0..command.end.0 + 1 {
+            //dbg!(command.start.1..command.end.1);
+            for j in command.start.1..command.end.1 + 1 {
+                grid[i as usize][j as usize] = match command.action {
+                    Action::Toggle => !grid[i as usize][j as usize],
+                    Action::TurnOn => true,
+                    Action::TurnOff => false,
+                }
+            }
+        }
+    }
+    grid.into_iter()
+        .map(|vec| vec.into_iter().filter(|&a| a).count())
+        .sum::<usize>() as u32
 }
 
 #[cfg(test)]
