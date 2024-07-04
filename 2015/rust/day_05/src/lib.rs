@@ -23,9 +23,9 @@ pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
         .into_iter()
-        .filter(|line| {
-            let has_enough_vowels = contains_vowels(input);
-            let has_bad_strings = contains_bad_strings(input);
+        .filter(|&line| {
+            let has_enough_vowels = contains_vowels(line);
+            let has_bad_strings = contains_bad_strings(line);
             let has_duplicate = contains_duplicate(line);
             has_enough_vowels && has_duplicate && !has_bad_strings
         })
