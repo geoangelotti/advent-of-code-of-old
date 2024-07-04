@@ -58,7 +58,7 @@ pub fn process_part_2(input: &str) -> u32 {
         .lines()
         .into_iter()
         .filter(|&line| {
-            let has_repeating = contains_repeating_with_seperator(input);
+            let has_repeating = contains_repeating_with_seperator(line);
             let has_pair = contains_pair(line);
             has_repeating && has_pair
         })
@@ -132,6 +132,7 @@ mod tests {
     #[case("xxyxx", 1)]
     #[case("uurcxstgmygtbstg", 0)]
     #[case("ieodomkazucvgmuy", 0)]
+    #[case("cvsrbdcvhtxxdmro", 0)]
     fn test_part_2(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_2(input);
         assert_eq!(result, expected);
