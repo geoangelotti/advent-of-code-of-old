@@ -27,12 +27,12 @@ impl<'a> InputPort<'a> {
 
 #[derive(Clone, Copy, Debug)]
 enum Gate {
-    ARROW,
-    AND,
-    OR,
-    NOT,
-    LSHIFT,
-    RSHIFT,
+    Wire,
+    And,
+    Or,
+    Not,
+    Lshift,
+    Rshift,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -47,12 +47,12 @@ impl<'a> Instruction<'a> {
         let a = self.input[0].resolve(map);
         let b = self.input[1].resolve(map);
         let c = match &self.gate {
-            Gate::ARROW => a,
-            Gate::AND => a & b,
-            Gate::OR => a | b,
-            Gate::NOT => !a,
-            Gate::LSHIFT => a << b,
-            Gate::RSHIFT => a >> b,
+            Gate::Wire => a,
+            Gate::And => a & b,
+            Gate::Or => a | b,
+            Gate::Not => !a,
+            Gate::Lshift => a << b,
+            Gate::Rshift => a >> b,
         };
         map.insert(self.output, c);
     }
@@ -67,10 +67,10 @@ fn parse_port(input: &str) -> IResult<&str, InputPort> {
 
 fn parse_gate_2(input: &str) -> IResult<&str, Gate> {
     alt((
-        tag(" AND ").map(|_| Gate::AND),
-        tag(" OR ").map(|_| Gate::OR),
-        tag(" LSHIFT ").map(|_| Gate::LSHIFT),
-        tag(" RSHIFT ").map(|_| Gate::RSHIFT),
+        tag(" AND ").map(|_| Gate::And),
+        tag(" OR ").map(|_| Gate::Or),
+        tag(" LSHIFT ").map(|_| Gate::Lshift),
+        tag(" RSHIFT ").map(|_| Gate::Rshift),
     ))(input)
 }
 
@@ -80,19 +80,19 @@ fn parse_not_instruction(input: &str) -> IResult<&str, Instruction> {
     Ok((
         input,
         Instruction {
-            gate: Gate::NOT,
+            gate: Gate::Not,
             input: [input_1, InputPort::Value(0)],
             output,
         },
     ))
 }
 
-fn parse_arrow_instruction(input: &str) -> IResult<&str, Instruction> {
+fn parse_wire_instruction(input: &str) -> IResult<&str, Instruction> {
     let (input, (input_1, output)) = separated_pair(parse_port, tag(" -> "), alpha1)(input)?;
     Ok((
         input,
         Instruction {
-            gate: Gate::ARROW,
+            gate: Gate::Wire,
             input: [input_1, InputPort::Value(0)],
             output,
         },
@@ -117,7 +117,7 @@ fn parse_instruction_2(input: &str) -> IResult<&str, Instruction> {
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
     alt((
         parse_instruction_2,
-        parse_arrow_instruction,
+        parse_wire_instruction,
         parse_not_instruction,
     ))(input)
 }
