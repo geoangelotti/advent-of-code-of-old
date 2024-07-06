@@ -7,7 +7,7 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::{preceded, separated_pair},
-    IResult, Parser,
+    IResult,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -17,44 +17,42 @@ enum InputPort<'a> {
 }
 
 impl<'a> InputPort<'a> {
-    fn resolve(&self, map: &BTreeMap<&str, u16>) -> u16 {
+    fn resolve(&self, map: &BTreeMap<&str, Instruction>) -> u16 {
         match &self {
-            InputPort::Port(key) => *map.get(key).unwrap_or(&0),
+            InputPort::Port(key) => map.get(key).unwrap().execute(map),
             InputPort::Value(v) => *v,
         }
     }
 }
 
 #[derive(Clone, Copy, Debug)]
-enum Gate {
-    Wire,
-    And,
-    Or,
-    Not,
-    Lshift,
-    Rshift,
+enum Gate<'a> {
+    Wire(InputPort<'a>),
+    And(InputPort<'a>, InputPort<'a>),
+    Or(InputPort<'a>, InputPort<'a>),
+    Not(InputPort<'a>),
+    Lshift(InputPort<'a>, u16),
+    Rshift(InputPort<'a>, u16),
 }
 
 #[derive(Clone, Copy, Debug)]
 struct Instruction<'a> {
-    gate: Gate,
-    input: [InputPort<'a>; 2],
+    gate: Gate<'a>,
     output: &'a str,
 }
 
 impl<'a> Instruction<'a> {
-    fn execute(&self, map: &mut BTreeMap<&'a str, u16>) {
-        let a = self.input[0].resolve(map);
-        let b = self.input[1].resolve(map);
-        let c = match &self.gate {
-            Gate::Wire => a,
-            Gate::And => a & b,
-            Gate::Or => a | b,
-            Gate::Not => !a,
-            Gate::Lshift => a << b,
-            Gate::Rshift => a >> b,
+    fn execute(&self, map: &BTreeMap<&'a str, Instruction>) -> u16 {
+        let result = match &self.gate {
+            Gate::Wire(a) => a.resolve(map),
+            Gate::And(a, b) => a.resolve(map) & b.resolve(map),
+            Gate::Or(a, b) => a.resolve(map) | b.resolve(map),
+            Gate::Not(a) => !a.resolve(map),
+            Gate::Lshift(a, b) => a.resolve(map) << b,
+            Gate::Rshift(a, b) => a.resolve(map) >> b,
         };
-        map.insert(self.output, c);
+        dbg!((self.output, result));
+        result
     }
 }
 
@@ -67,10 +65,22 @@ fn parse_port(input: &str) -> IResult<&str, InputPort> {
 
 fn parse_gate_2(input: &str) -> IResult<&str, Gate> {
     alt((
-        tag(" AND ").map(|_| Gate::And),
-        tag(" OR ").map(|_| Gate::Or),
-        tag(" LSHIFT ").map(|_| Gate::Lshift),
-        tag(" RSHIFT ").map(|_| Gate::Rshift),
+        map(
+            separated_pair(parse_port, tag(" AND "), parse_port),
+            |(a, b)| Gate::And(a, b),
+        ),
+        map(
+            separated_pair(parse_port, tag(" OR "), parse_port),
+            |(a, b)| Gate::Or(a, b),
+        ),
+        map(
+            separated_pair(parse_port, tag(" LSHIFT "), complete::u16),
+            |(a, b)| Gate::Lshift(a, b),
+        ),
+        map(
+            separated_pair(parse_port, tag(" RSHIFT "), complete::u16),
+            |(a, b)| Gate::Rshift(a, b),
+        ),
     ))(input)
 }
 
@@ -80,8 +90,7 @@ fn parse_not_instruction(input: &str) -> IResult<&str, Instruction> {
     Ok((
         input,
         Instruction {
-            gate: Gate::Not,
-            input: [input_1, InputPort::Value(0)],
+            gate: Gate::Not(input_1),
             output,
         },
     ))
@@ -92,26 +101,16 @@ fn parse_wire_instruction(input: &str) -> IResult<&str, Instruction> {
     Ok((
         input,
         Instruction {
-            gate: Gate::Wire,
-            input: [input_1, InputPort::Value(0)],
+            gate: Gate::Wire(input_1),
             output,
         },
     ))
 }
 
 fn parse_instruction_2(input: &str) -> IResult<&str, Instruction> {
-    let (input, input_1) = parse_port(input)?;
     let (input, gate) = parse_gate_2(input)?;
-    let (input, input_2) = parse_port(input)?;
     let (input, output) = preceded(tag(" -> "), alpha1)(input)?;
-    Ok((
-        input,
-        Instruction {
-            gate,
-            input: [input_1, input_2],
-            output,
-        },
-    ))
+    Ok((input, Instruction { gate, output }))
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
@@ -126,13 +125,13 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Instruction>> {
     separated_list1(newline, parse_line)(input)
 }
 
-pub fn process_part_1(input: &str) -> BTreeMap<&str, u16> {
+pub fn process_part_1(input: &str, key: &str) -> u16 {
     let mut map = BTreeMap::new();
     let (_, instuctions) = parse_input(input).unwrap();
     for instruction in instuctions {
-        instruction.execute(&mut map);
+        map.insert(instruction.output, instruction);
     }
-    map
+    map.get(key).unwrap().execute(&map)
 }
 
 #[cfg(test)]
@@ -159,7 +158,7 @@ NOT y -> i";
     #[case(INSTRUCTIONS, "x", 123)]
     #[case(INSTRUCTIONS, "y", 456)]
     fn test_process_part_1(#[case] input: &str, #[case] key: &str, #[case] expected: u16) {
-        let result = process_part_1(input);
-        assert_eq!(*result.get(key).unwrap(), expected);
+        let result = process_part_1(input, key);
+        assert_eq!(result, expected);
     }
 }
