@@ -129,7 +129,9 @@ fn parse_input(input: &str) -> IResult<&str, Vec<Instruction>> {
 pub fn process_part_1(input: &str) -> BTreeMap<&str, u16> {
     let mut map = BTreeMap::new();
     let (_, instuctions) = parse_input(input).unwrap();
-    dbg!(instuctions);
+    for instruction in instuctions {
+        instruction.execute(&mut map);
+    }
     map
 }
 
