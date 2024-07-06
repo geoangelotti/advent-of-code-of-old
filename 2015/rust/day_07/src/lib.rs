@@ -125,6 +125,20 @@ pub fn process_part_1(input: &str, key: &str) -> u16 {
     map.get(key).unwrap().execute(key, &map, &mut seen)
 }
 
+pub fn process_part_2(input: &str, key: &str) -> u16 {
+    let mut map = BTreeMap::new();
+    let mut seen: BTreeMap<&str, u16> = BTreeMap::new();
+    let (_, gates) = parse_input(input).unwrap();
+    for (output, gate) in gates {
+        map.insert(output, gate);
+    }
+    map.insert(
+        "b",
+        Gate::Wire(InputPort::Value(process_part_1(input, "a"))),
+    );
+    map.get(key).unwrap().execute(key, &map, &mut seen)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
