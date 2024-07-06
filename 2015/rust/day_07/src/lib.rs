@@ -17,9 +17,9 @@ enum InputPort<'a> {
 }
 
 impl<'a> InputPort<'a> {
-    fn resolve(&self, map: &BTreeMap<&str, Gate>) -> u16 {
+    fn resolve(&self, map: &BTreeMap<&'a str, Gate<'a>>, seen: &mut BTreeMap<&'a str, u16>) -> u16 {
         match &self {
-            InputPort::Port(key) => map.get(key).unwrap().execute(map),
+            InputPort::Port(key) => map.get(key).unwrap().execute(key, map, seen),
             InputPort::Value(v) => *v,
         }
     }
@@ -36,16 +36,24 @@ enum Gate<'a> {
 }
 
 impl<'a> Gate<'a> {
-    fn execute(&self, map: &BTreeMap<&'a str, Gate>) -> u16 {
+    fn execute(
+        &self,
+        key: &'a str,
+        map: &BTreeMap<&'a str, Gate<'a>>,
+        seen: &mut BTreeMap<&'a str, u16>,
+    ) -> u16 {
+        if let Some(value) = seen.get(key) {
+            return *value;
+        }
         let result = match &self {
-            Gate::Wire(a) => a.resolve(map),
-            Gate::And(a, b) => a.resolve(map) & b.resolve(map),
-            Gate::Or(a, b) => a.resolve(map) | b.resolve(map),
-            Gate::Not(a) => !a.resolve(map),
-            Gate::Lshift(a, b) => a.resolve(map) << b,
-            Gate::Rshift(a, b) => a.resolve(map) >> b,
+            Gate::Wire(a) => a.resolve(map, seen),
+            Gate::And(a, b) => a.resolve(map, seen) & b.resolve(map, seen),
+            Gate::Or(a, b) => a.resolve(map, seen) | b.resolve(map, seen),
+            Gate::Not(a) => !a.resolve(map, seen),
+            Gate::Lshift(a, b) => a.resolve(map, seen) << b,
+            Gate::Rshift(a, b) => a.resolve(map, seen) >> b,
         };
-        dbg!((self, result));
+        seen.insert(key, result);
         result
     }
 }
@@ -109,11 +117,12 @@ fn parse_input(input: &str) -> IResult<&str, Vec<(&str, Gate)>> {
 
 pub fn process_part_1(input: &str, key: &str) -> u16 {
     let mut map = BTreeMap::new();
+    let mut seen: BTreeMap<&str, u16> = BTreeMap::new();
     let (_, gates) = parse_input(input).unwrap();
     for (output, gate) in gates {
         map.insert(output, gate);
     }
-    map.get(key).unwrap().execute(&map)
+    map.get(key).unwrap().execute(key, &map, &mut seen)
 }
 
 #[cfg(test)]
