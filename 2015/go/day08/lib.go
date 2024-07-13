@@ -1,7 +1,6 @@
 package day08
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -19,7 +18,6 @@ func ProcessPart1(input string) int {
 	lines := strings.Split(input, "\n")
 	for _, line := range lines {
 		unescaped := unescape(line)
-		fmt.Println(line, len(line), len(unescaped))
 		acc += len(line) - len(unescaped)
 	}
 	return acc
