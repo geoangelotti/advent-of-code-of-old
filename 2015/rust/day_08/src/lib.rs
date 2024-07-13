@@ -38,9 +38,37 @@ fn unescape(input: &str) -> String {
     unescaped
 }
 
+fn escape(input: &str) -> String {
+    let mut escaped = String::new();
+    escaped.push('"');
+    let mut chars = input.chars();
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                escaped.push('\\');
+                escaped.push('\\');
+            }
+            '"' => {
+                escaped.push('\\');
+                escaped.push('"');
+            }
+            _ => {
+                escaped.push(c);
+            }
+        }
+    }
+    escaped.push('"');
+    escaped
+}
+
 fn difference_1(input: &str) -> (usize, usize) {
     let unescaped = unescape(input);
     (input.len(), unescaped.encode_utf16().count())
+}
+
+fn difference_2(input: &str) -> (usize, usize) {
+    let escaped = escape(input);
+    (escaped.len(), input.len())
 }
 
 pub fn process_part_1(input: &str) -> u32 {
@@ -52,7 +80,11 @@ pub fn process_part_1(input: &str) -> u32 {
 }
 
 pub fn process_part_2(input: &str) -> u32 {
-    todo!()
+    input
+        .lines()
+        .map(difference_2)
+        .map(|(a, b)| a - b)
+        .sum::<usize>() as u32
 }
 
 #[cfg(test)]
