@@ -52,6 +52,10 @@ pub fn process_part_1(input: &str) -> u32 {
         .sum::<usize>() as u32
 }
 
+pub fn process_part_2(input: &str) -> u32 {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -85,6 +89,16 @@ mod tests {
     #[case(INPUTS[4], 6)]
     fn test_procces_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case(INPUTS[0], 4)]
+    #[case(INPUTS[1], 4)]
+    #[case(INPUTS[2], 6)]
+    #[case(INPUTS[3], 5)]
+    fn test_procces_part_2(#[case] input: &str, #[case] expected: u32) {
+        let result = process_part_2(input);
         assert_eq!(result, expected);
     }
 }
