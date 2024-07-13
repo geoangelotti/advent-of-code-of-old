@@ -38,7 +38,7 @@ fn unescape(input: &str) -> String {
     unescaped
 }
 
-fn difference(input: &str) -> (usize, usize) {
+fn difference_1(input: &str) -> (usize, usize) {
     let unescaped = unescape(input);
     (input.len(), unescaped.encode_utf16().count())
 }
@@ -46,7 +46,7 @@ fn difference(input: &str) -> (usize, usize) {
 pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
-        .map(difference)
+        .map(difference_1)
         .map(|(a, b)| a - b)
         .sum::<usize>() as u32
 }
