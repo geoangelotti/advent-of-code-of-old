@@ -42,7 +42,7 @@ fn unescape(input: &str) -> String {
 fn difference(input: &str) -> (usize, usize) {
     let unescaped = unescape(input);
     //dbg!((input, &unescaped), (input.len(), &unescaped.len()));
-    (input.len(), unescaped.len())
+    (input.len(), unescaped.encode_utf16().count())
 }
 
 pub fn process_part_1(input: &str) -> u32 {
@@ -58,13 +58,20 @@ mod tests {
     use super::*;
     use rstest::rstest;
 
-    const INPUTS: [&str; 4] = [r#""""#, r#""abc""#, r#""aaa\"aaa""#, r#""\x27""#];
+    const INPUTS: [&str; 5] = [
+        r#""""#,
+        r#""abc""#,
+        r#""aaa\"aaa""#,
+        r#""\x27""#,
+        r#""e\xcef\\hkiu""#,
+    ];
 
     #[rstest]
     #[case(INPUTS[0], r#""#)]
     #[case(INPUTS[1], r#"abc"#)]
     #[case(INPUTS[2], r#"aaa"aaa"#)]
     #[case(INPUTS[3], r"'")]
+    #[case(INPUTS[4], r#"eÎf\hkiu"#)]
     fn test_unespace(#[case] input: &str, #[case] expected: &str) {
         let result = unescape(input);
         assert_eq!(result, expected);
@@ -76,6 +83,7 @@ mod tests {
     #[case(INPUTS[1], 2)]
     #[case(INPUTS[2], 3)]
     #[case(INPUTS[3], 5)]
+    #[case(INPUTS[4], 6)]
     fn test_procces_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
         assert_eq!(result, expected);
