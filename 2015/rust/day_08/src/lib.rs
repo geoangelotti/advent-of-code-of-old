@@ -1,6 +1,5 @@
 fn unescape(input: &str) -> String {
     let mut unescaped = String::new();
-
     let mut chars = input[1..input.len() - 1].chars().peekable();
     while let Some(c) = chars.next() {
         if c == '\\' {
