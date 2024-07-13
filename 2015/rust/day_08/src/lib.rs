@@ -1,6 +1,5 @@
 fn unescape(input: &str) -> String {
     let mut unescaped = String::new();
-
     let mut chars = input[1..input.len() - 1].chars().peekable();
     while let Some(c) = chars.next() {
         if c == '\\' {
@@ -39,15 +38,51 @@ fn unescape(input: &str) -> String {
     unescaped
 }
 
-fn difference(input: &str) -> (usize, usize) {
+fn escape(input: &str) -> String {
+    let mut escaped = String::new();
+    escaped.push('"');
+    let mut chars = input.chars();
+    while let Some(c) = chars.next() {
+        match c {
+            '\\' => {
+                escaped.push('\\');
+                escaped.push('\\');
+            }
+            '"' => {
+                escaped.push('\\');
+                escaped.push('"');
+            }
+            _ => {
+                escaped.push(c);
+            }
+        }
+    }
+    escaped.push('"');
+    escaped
+}
+
+fn difference_1(input: &str) -> (usize, usize) {
     let unescaped = unescape(input);
     (input.len(), unescaped.encode_utf16().count())
+}
+
+fn difference_2(input: &str) -> (usize, usize) {
+    let escaped = escape(input);
+    (escaped.len(), input.len())
 }
 
 pub fn process_part_1(input: &str) -> u32 {
     input
         .lines()
-        .map(difference)
+        .map(difference_1)
+        .map(|(a, b)| a - b)
+        .sum::<usize>() as u32
+}
+
+pub fn process_part_2(input: &str) -> u32 {
+    input
+        .lines()
+        .map(difference_2)
         .map(|(a, b)| a - b)
         .sum::<usize>() as u32
 }
@@ -85,6 +120,16 @@ mod tests {
     #[case(INPUTS[4], 6)]
     fn test_procces_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
+        assert_eq!(result, expected);
+    }
+
+    #[rstest]
+    #[case(INPUTS[0], 4)]
+    #[case(INPUTS[1], 4)]
+    #[case(INPUTS[2], 6)]
+    #[case(INPUTS[3], 5)]
+    fn test_procces_part_2(#[case] input: &str, #[case] expected: u32) {
+        let result = process_part_2(input);
         assert_eq!(result, expected);
     }
 }
