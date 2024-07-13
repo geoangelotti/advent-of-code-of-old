@@ -61,6 +61,17 @@ mod tests {
     const INPUTS: [&str; 4] = [r#""""#, r#""abc""#, r#""aaa\"aaa""#, r#""\x27""#];
 
     #[rstest]
+    #[case(INPUTS[0], r#""#)]
+    #[case(INPUTS[1], r#"abc"#)]
+    #[case(INPUTS[2], r#"aaa"aaa"#)]
+    #[case(INPUTS[3], r"'")]
+    fn test_unespace(#[case] input: &str, #[case] expected: &str) {
+        let result = unescape(input);
+        assert_eq!(result, expected);
+        assert_eq!(result.len(), expected.len())
+    }
+
+    #[rstest]
     #[case(INPUTS[0], 2)]
     #[case(INPUTS[1], 2)]
     #[case(INPUTS[2], 3)]
