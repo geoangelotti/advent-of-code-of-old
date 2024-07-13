@@ -41,7 +41,6 @@ fn unescape(input: &str) -> String {
 
 fn difference(input: &str) -> (usize, usize) {
     let unescaped = unescape(input);
-    //dbg!((input, &unescaped), (input.len(), &unescaped.len()));
     (input.len(), unescaped.encode_utf16().count())
 }
 
