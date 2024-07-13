@@ -1,5 +1,6 @@
 fn unescape(input: &str) -> String {
     let mut unescaped = String::new();
+
     let mut chars = input[1..input.len() - 1].chars().peekable();
     while let Some(c) = chars.next() {
         if c == '\\' {
@@ -57,11 +58,13 @@ mod tests {
     use super::*;
     use rstest::rstest;
 
+    const INPUTS: [&str; 4] = [r#""""#, r#""abc""#, r#""aaa\"aaa""#, r#""\x27""#];
+
     #[rstest]
-    #[case(r#""""#, 2)]
-    #[case(r#""abc""#, 2)]
-    #[case(r#""aaa\"aaa""#, 3)]
-    #[case(r#""\x27""#, 5)]
+    #[case(INPUTS[0], 2)]
+    #[case(INPUTS[1], 2)]
+    #[case(INPUTS[2], 3)]
+    #[case(INPUTS[3], 5)]
     fn test_procces_part_1(#[case] input: &str, #[case] expected: u32) {
         let result = process_part_1(input);
         assert_eq!(result, expected);
